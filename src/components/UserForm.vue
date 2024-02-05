@@ -2,28 +2,54 @@
   <div class="user-form text-left">
     <div class="user-form__field user-name flex align-start">
       <UiLabel id="name" required>Name</UiLabel>
-      <UiInput id="name" v-model="userForm.name" :required="!readMode" :disabled="readMode" :error="errors?.name"
-        :maxlength="25" style="width: 200px" class="flex-1" />
+      <UiInput
+        id="name"
+        v-model="userForm.name"
+        :required="!readMode"
+        :disabled="readMode"
+        :error="errors?.name"
+        :maxlength="25"
+        style="width: 200px"
+      />
     </div>
     <div class="user-form__field user-email">
       <UiLabel id="email" :required="!readMode" :disabled="readMode">Email</UiLabel>
-      <UiInput id="email" v-model="userForm.email" :disabled="readMode" :error="errors?.email" style="width: 200px"
-        class="flex-1" />
+      <UiInput id="email" v-model="userForm.email" :disabled="readMode" :error="errors?.email" style="width: 200px" />
     </div>
     <div class="user-form__field user-position">
       <UiLabel :disabled="readMode">Position</UiLabel>
-      <Dropdown v-model="userForm.code" :options="positionOptions" :required="!readMode" :disabled="readMode"
-        option-label="name" option-value="id" style="width: 200px" class="flex-1" />
+      <Dropdown
+        v-model="userForm.code"
+        :options="positionOptions"
+        :required="!readMode"
+        :disabled="readMode"
+        option-label="name"
+        option-value="id"
+        style="width: 200px"
+      />
     </div>
     <div class="user-form__field user-phone">
       <UiLabel id="phone">Phone</UiLabel>
-      <UiInput id="phone" v-model="userForm.phone" :disabled="readMode" :maxlength="10" :error="errors?.phone" rule="0-9"
-        style="width: 200px" class="flex-1" />
+      <UiInput
+        id="phone"
+        v-model="userForm.phone"
+        :disabled="readMode"
+        :maxlength="10"
+        :error="errors?.phone"
+        rule="0-9"
+        style="width: 200px"
+      />
     </div>
     <div class="user-form__field user-address">
       <UiLabel id="address">Address</UiLabel>
-      <UiInput id="address" v-model="userForm.address" :disabled="readMode" :error="errors?.address" :maxlength="25"
-        style="width: 200px" class="flex-1" />
+      <UiInput
+        id="address"
+        v-model="userForm.address"
+        :disabled="readMode"
+        :error="errors?.address"
+        :maxlength="25"
+        style="width: 200px"
+      />
     </div>
   </div>
 </template>
@@ -73,7 +99,7 @@ const readMode = computed(() => props.mode === EModeForm.VIEW);
  * @return CodeDto[]
  * */
 const getPositionCode = async () => {
-  await ApiService.GET("/code")
+  await ApiService.GET("/codes")
     .then((res) => {
       if (res.status === EStatusCode.OK) positionOptions.value = res.data;
     })

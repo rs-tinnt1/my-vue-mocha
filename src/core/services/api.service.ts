@@ -1,6 +1,6 @@
-import axios, { type AxiosRequestConfig } from "axios";
 import { API_URL, EStatusCode } from "@/core/constants/appConstants";
 import { TAnyType } from "@/core/constants/commonType";
+import axios, { type AxiosRequestConfig } from "axios";
 
 const instance = axios.create({
   // baseURL: url defined in .env file
@@ -78,6 +78,17 @@ const ApiService = {
    */
   PUT: <T = TAnyType>(url: string, data?: TAnyType, config?: AxiosRequestConfig) => {
     return instance<T>(url, { method: "put", url, data, ...config });
+  },
+  /**
+   * Sends a HTTP DELETE request to the specified URL.
+   *
+   * @param {string} url - The URL to send the request to.
+   * @param {AxiosRequestConfig} config - Optional configuration for the request.
+   * @returns {Promise<T>} A promise that resolves with the response data.
+   */
+
+  DELETE: <T = TAnyType>(url: string, config?: AxiosRequestConfig) => {
+    return instance<T>(url, { method: "delete", url, ...config });
   },
 };
 

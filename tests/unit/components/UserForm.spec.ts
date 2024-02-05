@@ -15,7 +15,6 @@ import { ToastUtils } from "@/core/utils/toastUtils";
 import UiLabel from "@/ui/atoms/UiLabel.vue";
 import UiInput from "@/ui/molecules/UiInput.vue";
 import { GlobalMountOptions } from "@vue/test-utils/dist/types";
-import { afterEach } from "node:test";
 import { TestUtils } from "../../utils/testUitls";
 
 interface IProps {
@@ -98,7 +97,7 @@ describe("UserForm.vue", () => {
     const rejected = Promise.reject<AxiosResponse<unknown>>(notFoundRequest).then();
 
     const resolved = Promise.resolve(response).then();
-    apiGetStub.withArgs("/code");
+    apiGetStub.withArgs("/codes");
 
     if (props?.isCodesError) apiGetStub.callsFake(() => rejected);
     else apiGetStub.returns(resolved);
@@ -118,15 +117,15 @@ describe("UserForm.vue", () => {
     messageUtilsStub.removeAll.resetHistory();
   });
 
-  it("No.1 [Normal]: Initial view mode > API GET /code executed with status === 200", async () => {
+  it("No.1 [Normal]: Initial view mode > API GET /codes executed with status === 200", async () => {
     const stub = createStub();
     const wrapper = componentMount();
     await flushPromises();
 
     try {
       await wrapper.vm.$nextTick();
-      const apiGetCodes = stub.withArgs("/code");
-      expect(stub.withArgs("/code").callCount).to.equal(1);
+      const apiGetCodes = stub.withArgs("/codes");
+      expect(stub.withArgs("/codes").callCount).to.equal(1);
 
       const apiCodesRes = await apiGetCodes.getCall(0).returnValue;
       expect(apiCodesRes.status).to.equal(EStatusCode.OK);
@@ -135,7 +134,7 @@ describe("UserForm.vue", () => {
     }
   });
 
-  it("No.2 [Normal]: Initial view mode > API GET /code executed with status === 404 and show toast error", async () => {
+  it("No.2 [Normal]: Initial view mode > API GET /codes executed with status === 404 and show toast error", async () => {
     const stub = createStub({ isCodesError: true });
     const wrapper = componentMount();
     await flushPromises();
@@ -145,7 +144,7 @@ describe("UserForm.vue", () => {
       expect(messageUtilsStub.error.withArgs("Request failed with status code 404").callCount).to.equal(1);
 
       try {
-        await stub.withArgs("/code").getCall(0).returnValue;
+        await stub.withArgs("/codes").getCall(0).returnValue;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         expect(e.response.status).to.eq(EStatusCode.NOT_FOUND);
@@ -155,9 +154,9 @@ describe("UserForm.vue", () => {
     }
   });
 
-  it("No.3 [Normal]: Initial view mode > API GET /code executed with status !== 200 position dropdown options is empty", async () => {
+  it("No.3 [Normal]: Initial view mode > API GET /codes executed with status !== 200 position dropdown options is empty", async () => {
     const stub = createStub();
-    stub.withArgs("/code").returns(
+    stub.withArgs("/codes").returns(
       Promise.resolve({
         data: [],
         status: EStatusCode.CREATED,
@@ -186,16 +185,16 @@ describe("UserForm.vue", () => {
 
     try {
       await wrapper.vm.$nextTick();
-      const nameInput = wrapper.find(".user-name").findComponent(UiInput);
+      const nameInput = wrapper.findAllComponents(UiInput)[0];
       expect(nameInput.props("modelValue")).to.equal("John Doe");
 
-      const emailInput = wrapper.find(".user-email").findComponent(UiInput);
+      const emailInput = wrapper.findAllComponents(UiInput)[1];
       expect(emailInput.props("modelValue")).to.equal("john.doe@example.com");
 
-      const phoneInput = wrapper.find(".user-phone").findComponent(UiInput);
+      const phoneInput = wrapper.findAllComponents(UiInput)[2];
       expect(phoneInput.props("modelValue")).to.equal("1234567890");
 
-      const addressInput = wrapper.find(".user-address").findComponent(UiInput);
+      const addressInput = wrapper.findAllComponents(UiInput)[3];
       expect(addressInput.props("modelValue")).to.equal("123 Main St");
     } finally {
       wrapper.unmount();
@@ -209,7 +208,7 @@ describe("UserForm.vue", () => {
 
     try {
       await wrapper.vm.$nextTick();
-      const positionInput = wrapper.find(".user-position").findComponent(Dropdown);
+      const positionInput = wrapper.findAllComponents(Dropdown)[0];
       expect(positionInput.props("modelValue")).to.equal("1");
 
       expect(positionInput.props("options")).to.deep.equal(CODES_DATA);
@@ -232,10 +231,10 @@ describe("UserForm.vue", () => {
 
     try {
       await wrapper.vm.$nextTick();
-      const nameInput = wrapper.find(".user-name").findComponent(UiInput);
+      const nameInput = wrapper.findAllComponents(UiInput)[0];
       expect(nameInput.props("error")).to.equal("Name is required");
 
-      const emailInput = wrapper.find(".user-email").findComponent(UiInput);
+      const emailInput = wrapper.findAllComponents(UiInput)[1];
       expect(emailInput.props("error")).to.equal("Email is required");
     } finally {
       wrapper.unmount();
@@ -251,10 +250,10 @@ describe("UserForm.vue", () => {
 
     try {
       await wrapper.vm.$nextTick();
-      const nameInput = wrapper.find(".user-name").findComponent(UiLabel);
+      const nameInput = wrapper.findAllComponents(UiLabel)[0];
       expect(nameInput.props("required")).to.eq(true);
 
-      const emailInput = wrapper.find(".user-email").findComponent(UiLabel);
+      const emailInput = wrapper.findAllComponents(UiLabel)[1];
       expect(emailInput.props("required")).to.eq(true);
     } finally {
       wrapper.unmount();
@@ -282,10 +281,10 @@ describe("UserForm.vue", () => {
       });
       await wrapper.vm.$nextTick();
 
-      const inputName = wrapper.find(".user-name").findComponent(UiInput);
+      const inputName = wrapper.findAllComponents(UiInput)[0];
       expect(inputName.props("modelValue")).to.equal("Doe John");
 
-      const inputEmail = wrapper.find(".user-email").findComponent(UiInput);
+      const inputEmail = wrapper.findAllComponents(UiInput)[1];
       expect(inputEmail.props("modelValue")).to.equal("abc@gmail.com");
     } finally {
       wrapper.unmount();
@@ -301,19 +300,24 @@ describe("UserForm.vue", () => {
 
     try {
       await wrapper.vm.$nextTick();
-      await wrapper.find(".user-name").findComponent(UiInput).vm.$emit("update:modelValue", "John Doe edited");
+      await wrapper.findAllComponents(UiInput)[0].vm.$emit("update:modelValue", "John Doe edited");
+      await wrapper.vm.$nextTick();
       expect(wrapper.emitted("update:user")).lengthOf(1);
 
-      await wrapper.find(".user-position").findComponent(Dropdown).vm.$emit("update:modelValue", "2");
+      await wrapper.findAllComponents(Dropdown)[0].vm.$emit("update:modelValue", "2");
+      await wrapper.vm.$nextTick();
       expect(wrapper.emitted("update:user")).lengthOf(2);
 
-      await wrapper.find(".user-phone").findComponent(UiInput).vm.$emit("update:modelValue", "0123456789");
+      await wrapper.findAllComponents(UiInput)[2].vm.$emit("update:modelValue", "0123456789");
+      await wrapper.vm.$nextTick();
       expect(wrapper.emitted("update:user")).lengthOf(3);
 
-      await wrapper.find(".user-address").findComponent(UiInput).vm.$emit("update:modelValue", "ABC Main St");
+      await wrapper.findAllComponents(UiInput)[3].vm.$emit("update:modelValue", "ABC Main St");
+      await wrapper.vm.$nextTick();
       expect(wrapper.emitted("update:user")).lengthOf(4);
 
-      await wrapper.find(".user-email").findComponent(UiInput).vm.$emit("update:modelValue", "abc@gmail.com");
+      await wrapper.findAllComponents(UiInput)[1].vm.$emit("update:modelValue", "abc@gmail.com");
+      await wrapper.vm.$nextTick();
       expect(wrapper.emitted("update:user")).lengthOf(5);
     } finally {
       wrapper.unmount();
